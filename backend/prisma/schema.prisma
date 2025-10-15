@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               Int        @id @default(autoincrement())
+  name             String
+  email            String     @unique
+  password         String
+  role             Role       @default(RESIDENT)
+  incidents        Incident[]
+  sentMessages     Message[]  @relation("SentMessages")
+  receivedMessages Message[]  @relation("ReceivedMessages")
+}
+
+model Message {
+  id         Int      @id @default(autoincrement())
+  sender     User     @relation("SentMessages", fields: [senderId], references: [id])
+  senderId   Int
+  receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  receiverId Int
+  content    String
+  createdAt  DateTime @default(now())
+}
+
+model Incident {
+  id           Int      @id @default(autoincrement())
+  title        String
+  description  String
+  type         String
+  latitude     Float
+  longitude    Float
+  status       Status   @default(PENDING)
+  reportedBy   User     @relation(fields: [reportedById], references: [id])
+  reportedById Int
+  createdAt    DateTime @default(now())
+}
+
+model Alert {
+  id             Int      @id @default(autoincrement())
+  title          String
+  message        String
+  targetAudience String
+  createdById    Int
+  createdAt      DateTime @default(now())
+}
+
+enum Role {
+  RESIDENT
+  OFFICER
+  ADMIN
+}
+
+enum Status {
+  PENDING
+  VERIFIED
+  RESOLVED
+}
