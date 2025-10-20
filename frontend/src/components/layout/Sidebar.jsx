@@ -11,9 +11,12 @@ import {
   BarChart3,
 } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
   const { user } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   // Base menu items for all roles
   const baseMenuItems = [
@@ -47,6 +50,24 @@ const Sidebar = () => {
     ...commonItems,
   ];
 
+  const handleNavigation = (path) => {
+    navigate(path);
+  };
+
+  const isActive = (path) => {
+    // Handle root path and dashboard
+    if (
+      path === "/dashboard" &&
+      (location.pathname === "/" || location.pathname === "/dashboard")
+    ) {
+      return true;
+    }
+    // Handle exact matches and sub-paths
+    return (
+      location.pathname === path || location.pathname.startsWith(path + "/")
+    );
+  };
+
   return (
     <aside className="w-64 bg-white shadow-sm border-r border-gray-200">
       <div className="p-4 border-b border-gray-200">
@@ -73,12 +94,14 @@ const Sidebar = () => {
         <ul className="space-y-2">
           {menuItems.map((item, index) => {
             const Icon = item.icon;
-            const isActive = item.path === "/dashboard"; // Simple active state for demo
+            const active = isActive(item.path);
+
             return (
               <li key={index}>
                 <button
+                  onClick={() => handleNavigation(item.path)}
                   className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-colors ${
-                    isActive
+                    active
                       ? "bg-primary-50 text-primary-700 border-r-2 border-primary-700"
                       : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   }`}

@@ -15,6 +15,16 @@ import SecurityOfficerDashboard from "./components/dashboard/SecurityOfficerDash
 import AdminDashboard from "./components/dashboard/AdminDashboard";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 
+// Import incidents pages
+import ResidentIncidents from "./pages/ResidentIncidents";
+import SecurityIncidents from "./pages/security/Incidents";
+import AdminIncidents from "./pages/admin/Incidents";
+
+// Import other pages
+import MapView from "./pages/MapView";
+import Messages from "./pages/Messages";
+import Settings from "./pages/Settings";
+
 const AppContent = () => {
   const { user } = useAuth();
 
@@ -28,6 +38,19 @@ const AppContent = () => {
         return <AdminDashboard />;
       default:
         return <ResidentDashboard />;
+    }
+  };
+
+  const getIncidentsComponent = () => {
+    switch (user?.role) {
+      case "resident":
+        return <ResidentIncidents />;
+      case "security_officer":
+        return <SecurityIncidents />;
+      case "admin":
+        return <AdminIncidents />;
+      default:
+        return <ResidentIncidents />;
     }
   };
 
@@ -52,26 +75,20 @@ const AppContent = () => {
                           path="/dashboard"
                           element={getDashboardComponent()}
                         />
+
+                        {/* Role-specific incidents routes */}
                         <Route
                           path="/incidents"
-                          element={
-                            <div className="p-6">
-                              Incidents Page - Coming Soon
-                            </div>
-                          }
+                          element={getIncidentsComponent()}
                         />
-                        <Route
-                          path="/map"
-                          element={
-                            <div className="p-6">Map View - Coming Soon</div>
-                          }
-                        />
-                        <Route
-                          path="/messages"
-                          element={
-                            <div className="p-6">Messages - Coming Soon</div>
-                          }
-                        />
+
+                        {/* Map View (currently same for all, can be made role-specific later) */}
+                        <Route path="/map" element={<MapView />} />
+
+                        {/* Messages */}
+                        <Route path="/messages" element={<Messages />} />
+
+                        {/* Security Officer Routes */}
                         <Route
                           path="/patrol"
                           element={
@@ -88,6 +105,8 @@ const AppContent = () => {
                             </div>
                           }
                         />
+
+                        {/* Admin Routes */}
                         <Route
                           path="/users"
                           element={
@@ -108,12 +127,9 @@ const AppContent = () => {
                             <div className="p-6">Reports - Coming Soon</div>
                           }
                         />
-                        <Route
-                          path="/settings"
-                          element={
-                            <div className="p-6">Settings - Coming Soon</div>
-                          }
-                        />
+
+                        {/* Common Routes */}
+                        <Route path="/settings" element={<Settings />} />
                       </Routes>
                     </main>
                   </div>
